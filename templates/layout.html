@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 保持原有的head内容 -->
+    <style>
+        .user-avatar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .user-avatar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .user-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: none;
+            min-width: 150px;
+        }
+
+        .user-menu.show {
+            display: block;
+        }
+
+        .user-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .user-menu a:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <!-- 用户头像和菜单 -->
+    {% if session.logged_in %}
+    <div class="user-avatar">
+        <img src="{{ session.avatar_url }}" alt="用户头像" id="userAvatar">
+        <div class="user-menu" id="userMenu">
+            <a href="{{ url_for('profile') }}">个人主页</a>
+            <a href="{{ url_for('logout') }}">退出登录</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- 原有的导航栏和内容 -->
+
+    <!-- 在原有的 JavaScript 之后添加 -->
+    <script>
+        document.getElementById('userAvatar')?.addEventListener('click', function() {
+            document.getElementById('userMenu').classList.toggle('show');
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('#userAvatar')) {
+                var menu = document.getElementById('userMenu');
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

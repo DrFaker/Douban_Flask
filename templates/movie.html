@@ -1,0 +1,289 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="referrer" content="no-referrer" />
+    <title>豆瓣Top250数据分析</title>
+    <meta content="" name="descriptison">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="static/assets/img/favicon.png" rel="icon">
+    <link href="static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+    <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="static/assets/css/style.css" rel="stylesheet">
+
+    <!-- 自定义样式 -->
+    <style>
+        .btn-primary:hover {
+            background-color: #3071a9 !important;
+            border-color: #285e8e !important;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 3px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sm i {
+            margin-right: 5px;
+        }
+
+        .table td {
+            vertical-align: middle !important;
+        }
+
+        .movie-title {
+            color: #428bca;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .movie-title:hover {
+            color: #3071a9;
+            text-decoration: underline;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+
+        .table thead th {
+            background-color: #428bca;
+            color: white;
+            border: none;
+        }
+
+        .favorite-btn {
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .favorite-btn i {
+            margin-right: 5px;
+        }
+
+        .favorite-btn.active {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .operations {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header">
+        <div class="container">
+            <div class="logo float-left">
+                <h1 class="text-light"><a href="/index"><span>Douban</span></a></h1>
+            </div>
+
+            <nav class="nav-menu float-right d-none d-lg-block">
+                <ul>
+                    <li><a href="/index">首页</a></li>
+                    <li class="active"><a href="/movie">电影</a></li>
+                    <li><a href="/score">评分</a></li>
+                    <li><a href="/word">词云</a></li>
+                    <li><a href="/profile">个人主页</a></li>
+                    <!-- 添加用户头像和下拉菜单 -->
+                    <li class="user-profile">
+                        {% if session.get('logged_in') %}
+                            <div class="dropdown">
+                                <div class="user-avatar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if session.get('avatar_url') %}
+                                        <img src="{{ session.get('avatar_url') }}" alt="用户头像">
+                                    {% else %}
+                                        <img src="/static/assets/img/default-avatar.png" alt="默认头像">
+                                    {% endif %}
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <h6 class="dropdown-header">欢迎, {{ session.get('username') }}</h6>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="bx bx-user"></i> 个人主页
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/logout">
+                                        <i class="bx bx-log-out"></i> 退出登录
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="/login" class="login-btn">登录</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ======= Our Team Section ======= -->
+    <section id="team" class="team">
+        <div class="container">
+            <div class="section-title">
+                <h2>豆瓣Top250电影</h2>
+                <p>收录了豆瓣评分最高的250部电影</p>
+            </div>
+
+            <!-- ======= Movies Table Section ======= -->
+            <section class="counts section-bg">
+                <div class="container">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>排名</th>
+                                    <th>图片</th>
+                                    <th>电影中文名称</th>
+                                    <th>电影外国名称</th>
+                                    <th>评分</th>
+                                    <th>评价人数</th>
+                                    <th>概述</th>
+                                    <th>其它信息</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for movie in movies %}
+                                <tr>
+                                    <td>{{ movie[0] }}</td>
+                                    <td>
+                                        <img src="{{ movie[2] }}" style="width:60px;height: 70px" alt="{{ movie[3] }}">
+                                    </td>
+                                    <td>
+                                        <a href="{{ movie[1] }}" target="_blank" class="movie-title">
+                                            {{ movie[3] }}
+                                        </a>
+                                    </td>
+                                    <td>{{ movie[4] }}</td>
+                                    <td>{{ movie[5] }}</td>
+                                    <td>{{ movie[6] }}</td>
+                                    <td>{{ movie[7] }}</td>
+                                    <td>{{ movie[8] }}</td>
+                                    <td class="operations">
+                                        <button class="btn btn-sm favorite-btn {% if movie[0] in favorite_movies %}active{% endif %}"
+                                                onclick="toggleFavorite({{ movie[0] }}, this)">
+                                            <i class="bx {% if movie[0] in favorite_movies %}bxs-heart{% else %}bx-heart{% endif %}"></i>
+                                            {% if movie[0] in favorite_movies %}已收藏{% else %}收藏{% endif %}
+                                        </button>
+                                        <a href="{{ url_for('movie_recommendations', movie_id=movie[0]) }}"
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bx bx-movie-play"></i> 查看推荐
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Mamba</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="static/assets/vendor/php-email-form/validate.js"></script>
+    <script src="static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+    <script src="static/assets/vendor/venobox/venobox.min.js"></script>
+    <script src="static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+    <script src="static/assets/vendor/counterup/counterup.min.js"></script>
+    <script src="static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="static/assets/vendor/aos/aos.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="static/assets/js/main.js"></script>
+
+    <!-- 收藏功能 JavaScript -->
+    <script>
+        function toggleFavorite(movieId, button) {
+            fetch(`/toggle_favorite/${movieId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    button.classList.toggle('active');
+                    const icon = button.querySelector('i');
+                    const text = button.lastChild;
+                    if (data.is_favorite) {
+                        icon.classList.replace('bx-heart', 'bxs-heart');
+                        text.textContent = '已收藏';
+                        button.classList.add('btn-danger');
+                    } else {
+                        icon.classList.replace('bxs-heart', 'bx-heart');
+                        text.textContent = '收藏';
+                        button.classList.remove('btn-danger');
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // 初始化用户下拉菜单
+        $(document).ready(function() {
+            $('.dropdown-toggle').dropdown();
+
+            $('.user-avatar').click(function(e) {
+                e.preventDefault();
+                $(this).parent().find('.dropdown-menu').toggleClass('show');
+            });
+
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.user-profile').length) {
+                    $('.dropdown-menu').removeClass('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

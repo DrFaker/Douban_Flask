@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="referrer" content="no-referrer" />
+    <title>个人主页 - 豆瓣Top250数据分析</title>
+
+    <!-- Favicons -->
+    <link href="{{ url_for('static', filename='assets/img/favicon.png') }}" rel="icon">
+    <link href="{{ url_for('static', filename='assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{{ url_for('static', filename='assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/icofont/icofont.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/venobox/venobox.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/aos/aos.css') }}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+
+    <!-- 个人主页特定样式 -->
+    <style>
+        .profile-section {
+            padding: 80px 0;
+            min-height: calc(100vh - 200px);
+            background: #f8f9fa;
+        }
+        .profile-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            border: 3px solid #428bca;
+        }
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .info-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-item i {
+            margin-right: 10px;
+            color: #428bca;
+        }
+        .movie-section {
+            margin-top: 30px;
+        }
+        .movie-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: white;
+            transition: transform 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+        .movie-card img {
+            width: 100px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .recommendation-header {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .recommendation-intro {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+        .movie-type {
+            color: #428bca;
+            font-weight: 600;
+            background: #e8f4ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        .movie-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #428bca;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header">
+        <div class="container">
+            <div class="logo float-left">
+                <h1 class="text-light"><a href="/index"><span>Douban</span></a></h1>
+            </div>
+
+            <nav class="nav-menu float-right d-none d-lg-block">
+                <ul>
+                    <li><a href="/index">首页</a></li>
+                    <li><a href="/movie">电影</a></li>
+                    <li><a href="/score">评分</a></li>
+                    <li><a href="/word">词云</a></li>
+                    <li class="active"><a href="/profile">个人主页</a></li>
+                    <!-- 添加用户头像和下拉菜单 -->
+                    <li class="user-profile">
+                        {% if session.get('logged_in') %}
+                            <div class="dropdown">
+                                <div class="user-avatar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if session.get('avatar_url') %}
+                                        <img src="{{ session.get('avatar_url') }}" alt="用户头像">
+                                    {% else %}
+                                        <img src="/static/assets/img/default-avatar.png" alt="默认头像">
+                                    {% endif %}
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <h6 class="dropdown-header">欢迎, {{ session.get('username') }}</h6>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="bx bx-user"></i> 个人主页
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/logout">
+                                        <i class="bx bx-log-out"></i> 退出登录
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="/login" class="login-btn">登录</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main">
+        <section class="profile-section">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">
+                                    <img src="{{ user[3] or '/static/assets/img/default-avatar.png' }}" alt="用户头像">
+                                </div>
+                                <h2>{{ user[1] }}</h2>
+                            </div>
+
+                            <div class="profile-info">
+                                <div class="info-item">
+                                    <i class="bx bx-user"></i>
+                                    <span>用户名：{{ user[1] }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bx bx-time"></i>
+                                    <span>注册时间：{{ user[5].strftime('%Y-%m-%d %H:%M:%S') if user[5] else 'Unknown' }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="bx bx-log-in"></i>
+                                    <span>最后登录：{{ user[4].strftime('%Y-%m-%d %H:%M:%S') if user[4] else 'Unknown' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 收藏的电影 -->
+                        {% if favorite_movies %}
+                        <div class="movie-section">
+                            <h3>我的收藏</h3>
+                            <div class="row">
+                                {% for movie in favorite_movies %}
+                                <div class="col-md-6">
+                                    <div class="movie-card">
+                                        <div class="d-flex">
+                                            <img src="{{ movie[2] }}" alt="{{ movie[3] }}">
+                                            <div class="ml-3">
+                                                <h5>{{ movie[3] }}</h5>
+                                                <p>评分: {{ movie[5] }}</p>
+                                                <a href="{{ url_for('movie_recommendations', movie_id=movie[0]) }}"
+                                                   class="btn btn-sm btn-primary">查看推荐</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- 推荐电影部分 -->
+                        {% if recommended_movies %}
+                        <div class="movie-section">
+                            <div class="section-header">
+                                <h3>电影推荐</h3>
+                            </div>
+
+                            {% if movie_types %}
+                            <div class="recommendation-header">
+                                <p class="recommendation-intro">
+                                    根据您的观影喜好分析，您偏爱
+                                    {% for type in movie_types %}
+                                        {% if loop.last and not loop.first %}
+                                        和
+                                        {% elif not loop.first %}
+                                        、
+                                        {% endif %}
+                                        <span class="movie-type">{{ type }}</span>
+                                    {% endfor %}
+                                    类型的电影。
+                                </p>
+                                <p class="text-muted mt-2">
+                                    以下是为您精心挑选的相似电影推荐：
+                                </p>
+                            </div>
+                            {% endif %}
+
+                            <div class="row">
+                                {% for movie in recommended_movies %}
+                                <div class="col-md-6">
+                                    <div class="movie-card">
+                                        <div class="d-flex">
+                                            <img src="{{ movie[2] }}" alt="{{ movie[3] }}" class="mr-3">
+                                            <div>
+                                                <h5 class="mb-2">{{ movie[3] }}</h5>
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <i class="bx bxs-star text-warning mr-1"></i>
+                                                    <span>{{ movie[5] }}</span>
+                                                </div>
+                                                {% if movie[8] %}
+                                                <p class="movie-info">{{ movie[8] }}</p>
+                                                {% endif %}
+                                                <a href="{{ url_for('movie_recommendations', movie_id=movie[0]) }}"
+                                                   class="btn btn-sm btn-primary">
+                                                    <i class="bx bx-movie-play"></i> 查看推荐
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Mamba</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='assets/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/jquery.easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/php-email-form/validate.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/jquery-sticky/jquery.sticky.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/venobox/venobox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/waypoints/jquery.waypoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/counterup/counterup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/aos/aos.js') }}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+
+    <!-- 添加交互效果的 JavaScript -->
+    <script>
+    $(document).ready(function() {
+        // 用户头像下拉菜单
+        $('.user-avatar').click(function(e) {
+            e.preventDefault();
+            $(this).parent().find('.dropdown-menu').toggleClass('show');
+        });
+
+        // 点击其他地方关闭下拉菜单
+        $(document).click(function(e) {
+            if (!$(e.target).closest('.user-profile').length) {
+                $('.dropdown-menu').removeClass('show');
+            }
+        });
+
+        // 添加动画效果
+        AOS.init();
+    });
+    </script>
+</body>
+</html>

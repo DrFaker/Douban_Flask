@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>注册 - 豆瓣Top250数据分析</title>
+
+    <!-- 保持与原网站相同的CSS引用 -->
+    <link href="static/assets/img/favicon.png" rel="icon">
+    <link href="static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="static/assets/css/style.css" rel="stylesheet">
+
+    <!-- 注册页面特定样式 -->
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px 0;
+        }
+
+        .register-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: #428bca;
+        }
+
+        .register-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .register-title h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            height: 45px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #428bca;
+            box-shadow: 0 0 0 0.2rem rgba(66, 139, 202, 0.25);
+        }
+
+        .btn-register {
+            background: #428bca;
+            color: #fff;
+            padding: 12px 0;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .alert {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .register-footer a {
+            color: #428bca;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .register-footer a:hover {
+            color: #357abd;
+            text-decoration: underline;
+        }
+
+        .avatar-upload {
+            position: relative;
+            max-width: 200px;
+            margin: 0 auto 20px;
+        }
+
+        .avatar-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto 10px;
+            border: 3px solid #428bca;
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-title">
+                <h2>创建新账户</h2>
+                <p>加入豆瓣Top250数据分析</p>
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data">
+                <div class="avatar-upload">
+                    <div class="avatar-preview">
+                        <img id="avatarPreview" src="static/assets/img/default-avatar.png" alt="头像预览">
+                    </div>
+                    <div class="text-center">
+                        <label for="avatar" class="btn btn-outline-primary btn-sm">
+                            选择头像
+                        </label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" class="form-control" id="username" name="username"
+                           required minlength="3" maxlength="20" autocomplete="off"
+                           placeholder="请输入3-20个字符的用户名">
+                    <div class="password-requirements">
+                        用户名长度3-20个字符，只能包含字母、数字和下划线
+                    </div>
+                </div>
+
+
+
+                <div class="form-group">
+                    <label for="nickname">昵称</label>
+                    <input type="text" class="form-control" id="nickname" name="nickname"
+                           required minlength="2" maxlength="20"
+                           placeholder="请输入您想显示的昵称">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" class="form-control" id="password" name="password"
+                           required minlength="6" maxlength="20"
+                           placeholder="请输入密码">
+                    <div class="password-requirements">
+                        密码长度6-20个字符，必须包含字母和数字
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">确认密码</label>
+                    <input type="password" class="form-control" id="confirm_password"
+                           name="confirm_password" required
+                           placeholder="请再次输入密码">
+                </div>
+
+                <button type="submit" class="btn btn-register">注册</button>
+            </form>
+
+            <div class="register-footer">
+                <p>已有账号？ <a href="{{ url_for('login') }}">立即登录</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="static/assets/vendor/jquery/jquery.min.js"></script>
+    <script src="static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="static/assets/js/main.js"></script>
+
+    <!-- 头像预览脚本 -->
+    <script>
+        document.getElementById('avatar').onchange = function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        // 表单验证
+        document.querySelector('form').onsubmit = function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致！');
+                e.preventDefault();
+                return false;
+            }
+
+            // 密码强度验证
+            if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$/.test(password)) {
+                alert('密码必须包含字母和数字，长度在6-20个字符之间！');
+                e.preventDefault();
+                return false;
+            }
+
+            // 用户名验证
+            const username = document.getElementById('username').value;
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                alert('用户名只能包含字母、数字和下划线，长度在3-20个字符之间！');
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        };
+    </script>
+</body>
+</html>

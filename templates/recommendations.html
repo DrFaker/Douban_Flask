@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="referrer" content="no-referrer" />
+    <title>电影推荐 - 豆瓣Top250数据分析</title>
+    <meta content="" name="descriptison">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="{{ url_for('static', filename='assets/img/favicon.png') }}" rel="icon">
+    <link href="{{ url_for('static', filename='assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="{{ url_for('static', filename='assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/icofont/icofont.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/animate.css/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/venobox/venobox.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/vendor/aos/aos.css') }}" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="{{ url_for('static', filename='assets/css/style.css') }}" rel="stylesheet">
+
+    <!-- 自定义样式 -->
+    <style>
+        .movie-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-image {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .movie-image img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .movie-info {
+            padding: 20px;
+        }
+
+        .movie-title {
+            color: #428bca;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .movie-meta {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .movie-score {
+            color: #ff9800;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .current-movie {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        }
+
+        .recommendation-title {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .recommendation-title:after {
+            content: '';
+            position: absolute;
+            display: block;
+            width: 50px;
+            height: 3px;
+            background: #428bca;
+            bottom: 0;
+            left: 0;
+        }
+
+        .similar-score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(66, 139, 202, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+        }
+
+        .copyrights {
+            text-indent:-9999px;
+            height:0;
+            line-height:0;
+            font-size:0;
+            overflow:hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header">
+        <div class="container">
+            <div class="logo float-left">
+                <h1 class="text-light"><a href="index.html"><span>Douban</span></a></h1>
+            </div>
+
+            <nav class="nav-menu float-right d-none d-lg-block">
+                <ul>
+                    <li><a href="/index">首页</a></li>
+                    <li class="active"><a href="/movie">电影</a></li>
+                    <li><a href="/score">评分</a></li>
+                    <li><a href="/word">词云</a></li>
+                    <li><a href="/team">团队</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 推荐内容部分 -->
+    <section id="recommendations" class="team section-bg" style="padding-top: 100px;">
+        <div class="current-movie">
+            <div class="row">
+                <div class="col-lg-4">
+                    <img src="{{ current_movie.pic_link }}" alt="{{ current_movie.cname }}"
+                         class="img-fluid" style="border-radius: 8px;">
+                </div>
+                <div class="col-lg-8">
+                    <h2>{{ current_movie.cname }}</h2>
+                    <h4 class="text-muted">{{ current_movie.ename }}</h4>
+                    <div class="movie-meta">
+                        <p class="movie-score">
+                            <strong>评分：</strong>
+                            <span style="color: #ff9800;">{{ current_movie.score }}</span>
+                            <small>({{ current_movie.rated }}人评价)</small>
+                        </p>
+                        <p><strong>简介：</strong>{{ current_movie.introduce }}</p>
+                        <p><strong>详细信息：</strong>{{ current_movie.info }}</p>
+
+                        <!-- 修改后的评论部分 -->
+                        <div class="movie-comments">
+                            <h4 class="comments-title">热门评论 (Top 5)</h4>
+                            <div class="comments-container">
+                                {% if current_movie.comments %}
+                                    {% for comment in current_movie.comments %}
+                                    <div class="comment-item">
+                                        <div class="comment-content">
+                                            <i class="bx bxs-quote-left quote-icon"></i>
+                                            {{ comment }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-muted">暂无评论</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Recommendations -->
+            <div class="section-title">
+                <h2>相似电影推荐</h2>
+                <p>根据电影评分、简介、评论等多个维度为您推荐以下相似电影</p>
+            </div>
+
+            <div class="row">
+                {% for movie in recommended_movies %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="movie-card" data-aos="fade-up">
+                        <div class="movie-image">
+                            <img src="{{ movie.pic_link }}" alt="{{ movie.cname }}">
+                            <div class="similar-score">
+                                相似度: {{ "%.2f"|format(movie.similarity_score) }}
+                            </div>
+                        </div>
+                        <div class="movie-info">
+                            <h4 class="movie-title">{{ movie.cname }}</h4>
+                            <p class="movie-subtitle">{{ movie.ename }}</p>
+                            <div class="movie-meta">
+                                <p>
+                                    <i class="bx bx-star"></i>
+                                    <span class="movie-score">{{ movie.score }}</span>
+                                    <small>({{ movie.rated }}人评价)</small>
+                                </p>
+                                <p class="movie-intro">{{ movie.introduce[:100] }}...</p>
+                            </div>
+                            <a href="{{ movie.info_link }}" target="_blank"
+                               class="btn btn-primary btn-sm">
+                                <i class="bx bx-link-external"></i> 查看详情
+                            </a>
+                            <a href="/movie/{{ movie.id }}/recommendations"
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bx bx-movie-play"></i> 查看推荐
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ======= Footer ======= -->
+    <footer id="footer">
+        <div class="container">
+            <div class="copyright">
+                &copy; Copyright <strong><span>Mamba</span></strong>. All Rights Reserved
+            </div>
+            <div class="credits">
+                More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="{{ url_for('static', filename='assets/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/jquery.easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/php-email-form/validate.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/jquery-sticky/jquery.sticky.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/venobox/venobox.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/waypoints/jquery.waypoints.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/counterup/counterup.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendor/aos/aos.js') }}"></script>
+
+    <!-- Template Main JS File -->
+    <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+
+    <div class="copyrights" id="links20210126">
+        Collect from <a href="http://www.cssmoban.com/" title="网站模板">模板之家</a>
+        <a href="https://www.chazidian.com/" title="查字典">查字典</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>豆瓣Top250数据分析</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="static/assets/img/favicon.png" rel="icon">
+  <link href="static/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,600,600i,700,700i,900" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="static/assets/vendor/venobox/venobox.css" rel="stylesheet">
+  <link href="static/assets/vendor/aos/aos.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="static/assets/css/style.css" rel="stylesheet">
+
+        <!-- 添加用户头像相关样式 -->
+  <style>
+        .user-profile {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-left: 15px;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dropdown-menu {
+            min-width: 200px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item {
+            padding: 8px 15px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #428bca;
+        }
+
+        .login-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            background-color: #428bca;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #357abd;
+            color: white;
+            transform: translateY(-2px);
+        }
+  </style>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <header id="header">
+        <div class="container">
+            <div class="logo float-left">
+                <h1 class="text-light"><a href="index.html"><span>Douban</span></a></h1>
+            </div>
+
+            <nav class="nav-menu float-right d-none d-lg-block">
+                <ul>
+                    <li class="active"><a href="/index">首页<i class="la la-angle-down"></i></a></li>
+                    <li><a href="/movie">电影</a></li>
+                    <li><a href="/score">评分</a></li>
+                    <li><a href="/word">词云</a></li>
+                    <li><a href="/profile">个人主页</a></li>
+                    <!-- 添加用户头像和下拉菜单 -->
+                    <li class="user-profile">
+                        {% if session.get('logged_in') %}
+                            <div class="dropdown">
+                                <div class="user-avatar" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% if session.get('avatar_url') %}
+                                        <img src="{{ session.get('avatar_url') }}" alt="用户头像">
+                                    {% else %}
+                                        <img src="/static/assets/img/default-avatar.png" alt="默认头像">
+                                    {% endif %}
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-right">
+                                    <h6 class="dropdown-header">欢迎, {{ session.get('username') }}</h6>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="bx bx-user"></i> 个人主页
+                                    </a>
+                                    <a class="dropdown-item" href="/favorites">
+                                        <i class="bx bx-heart"></i> 我的收藏
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/logout">
+                                        <i class="bx bx-log-out"></i> 退出登录
+                                    </a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="/login" class="login-btn">登录</a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+  <!-- ======= Our Team Section ======= -->
+  <section id="team" class="team">
+      <div class="container">
+
+          <div class="section-title">
+              <h2>豆瓣Top250数据分析</h2>
+              <p>应用python爬虫、Flask框架、Echarts、WordCloud等技术实现</p>
+          </div>
+
+          <!-- ======= Counts Section ======= -->
+          <section class="counts section-bg">
+              <div class="container">
+
+                  <div class="row">
+
+                      <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up">
+                          <a href="/movie">
+                              <div class="count-box">
+                                  <i class="icofont-simple-smile" style="color: #20b38e;"></i>
+                                  <span data-toggle="counter-up">250</span>
+                                  <p>经典电影</p>
+                              </div>
+                          </a>
+
+                      </div>
+
+                      <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="200">
+                          <a href="/score">
+                              <div class="count-box">
+                                  <i class="icofont-document-folder" style="color: #c042ff;"></i>
+                                  <span data-toggle="counter-up">1</span>
+                                  <p>评分统计</p>
+                              </div>
+                          </a>
+
+                      </div>
+
+                      <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="400">
+                          <a href="/word">
+                              <div class="count-box">
+                                  <i class="icofont-live-support" style="color: #46d1ff;"></i>
+                                  <span data-toggle="counter-up">5693</span>
+                                  <p>词汇统计</p>
+                              </div>
+                          </a>
+                      </div>
+
+                      <div class="col-lg-3 col-md-6 text-center" data-aos="fade-up" data-aos-delay="600">
+                        <a href="/profile">  <!-- 修改链接从 /team 改为 /profile -->
+                            <div class="count-box">
+                                <i class="icofont-users-alt-5" style="color: #ffb459;"></i>
+                                <span data-toggle="counter-up">1</span>  <!-- 修改数字从 5 改为 1 -->
+                                <p>个人主页</p>  <!-- 修改文字从 "团队成员" 改为 "个人主页" -->
+                            </div>
+                        </a>
+                      </div>
+
+                  </div>
+
+              </div>
+          </section><!-- End Counts Section -->
+
+      </div>
+  </section><!-- End Our Team Section -->
+
+
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+
+    <div class="container">
+      <div class="copyright">
+        &copy; Copyright <strong><span>Mamba</span></strong>. All Rights Reserved
+      </div>
+      <div class="credits">
+       More Templates <a href="http://www.cssmoban.com/" target="_blank" title="模板之家">模板之家</a> - Collect from <a href="http://www.cssmoban.com/" title="网页模板" target="_blank">网页模板</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="static/assets/vendor/jquery/jquery.min.js"></script>
+  <script src="static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="static/assets/vendor/php-email-form/validate.js"></script>
+  <script src="static/assets/vendor/jquery-sticky/jquery.sticky.js"></script>
+  <script src="static/assets/vendor/venobox/venobox.min.js"></script>
+  <script src="static/assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="static/assets/vendor/counterup/counterup.min.js"></script>
+  <script src="static/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="static/assets/vendor/aos/aos.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="static/assets/js/main.js"></script>
+        <!-- 添加用户交互相关的 JavaScript -->
+        <!-- 添加用户交互相关的 JavaScript -->
+  <script>
+        $(document).ready(function() {
+            // 检查登录状态
+            {% if not session.get('logged_in') %}
+                // 如果未登录，重定向到登录页面
+                window.location.href = '/login';
+            {% endif %}
+
+            // 初始化下拉菜单
+            $('.dropdown-toggle').dropdown();
+
+            // 添加头像点击效果
+            $('.user-avatar').click(function(e) {
+                e.preventDefault();
+                $(this).parent().find('.dropdown-menu').toggleClass('show');
+            });
+
+            // 点击其他地方关闭下拉菜单
+            $(document).click(function(e) {
+                if (!$(e.target).closest('.user-profile').length) {
+                    $('.dropdown-menu').removeClass('show');
+                }
+            });
+        });
+  </script>
+
+<style>
+.copyrights{text-indent:-9999px;height:0;line-height:0;font-size:0;overflow:hidden;}
+</style>
+<div class="copyrights" id="links20210126">
+	Collect from <a href="http://www.cssmoban.com/"  title="网站模板">模板之家</a>
+	<a href="https://www.chazidian.com/"  title="查字典">查字典</a>
+</div>
+</body>
+
+</html>
